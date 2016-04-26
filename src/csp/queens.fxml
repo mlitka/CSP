@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<SplitPane dividerPositions="0.29797979797979796" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="csp.Controller">
+  <items>
+      <TabPane tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab id="nQueensTab" text="N-Queens">
+               <content>
+                <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="300.0">
+                     <children>
+                        <Button id="backtrackQueensButton" layoutX="41.0" layoutY="320.0" mnemonicParsing="false" onAction="#doBacktrackingQueens" prefHeight="25.0" prefWidth="121.0" text="Backtracking" />
+                        <CheckBox layoutX="47.0" layoutY="270.0" mnemonicParsing="false" text="CheckBox" />
+                        <Button id="forwardQueensButton" layoutX="41.0" layoutY="354.0" mnemonicParsing="false" onAction="#doForwardQueens" prefHeight="25.0" prefWidth="122.0" text="Forward Checking" />
+                        <Slider fx:id="nQueensSlider" layoutX="32.0" layoutY="113.0" majorTickUnit="5.0" max="20.0" min="1.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" visible="false" />
+                        <Label fx:id="nQueensLabel" layoutX="38.0" layoutY="79.0" text="Number of Queens" visible="false" />
+                        <Label layoutX="20.0" layoutY="14.0" text="N-Queens Problem">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="queensNumberLabel" layoutX="145.0" layoutY="69.0" prefHeight="38.0" prefWidth="36.0" />
+                        <Button fx:id="startQueensButton" layoutX="71.0" layoutY="165.0" mnemonicParsing="false" onAction="#startQueens" prefHeight="39.0" prefWidth="62.0" text="Start" />
+                        <Text fx:id="nQueensVisitedText" layoutX="105.0" layoutY="438.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="70.0" />
+                        <Label fx:id="nQueensVisitedTextLabel" layoutX="47.0" layoutY="425.0" text="VISITED:" visible="false" />
+                        <Text fx:id="algorithmNameText" boundsType="LOGICAL_VERTICAL_CENTER" fill="#0067ff" layoutX="26.0" layoutY="410.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="156.0" />
+                        <Label fx:id="nQueensVisitedTimeLabel" layoutX="49.0" layoutY="450.0" text="TIME:" visible="false" />
+                        <Text fx:id="nQueensVisitedTime" layoutX="105.0" layoutY="463.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="70.0" />
+                        <CheckBox layoutX="47.0" layoutY="242.0" mnemonicParsing="false" text="CheckBox" />
+                     </children>
+                     <effect>
+                        <DropShadow blurType="GAUSSIAN" color="#0000008b" />
+                     </effect>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab id="sudokuTab" text="csp.Sudoku">
+               <content>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="300.0">
+                     <children>
+                         <Button id="backtrackSudokuButton" layoutX="41.0" layoutY="320.0" mnemonicParsing="false" onAction="#doBacktrackingSudoku" prefHeight="25.0" prefWidth="121.0" text="Backtracking" />
+                         <CheckBox layoutX="47.0" layoutY="270.0" mnemonicParsing="false" text="CheckBox" />
+                         <Button id="forwardSudokuButton" layoutX="41.0" layoutY="354.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="122.0" text="Forward Checking" />
+                         <Slider fx:id="sudokuSlider" layoutX="32.0" layoutY="113.0" majorTickUnit="5.0" max="5" min="2" minorTickCount="2" showTickLabels="true" showTickMarks="true" visible="false" />
+                         <Label fx:id="sudokuLabel" layoutX="38.0" layoutY="79.0" text="Number of Queens" visible="false" />
+                         <Label layoutX="20.0" layoutY="14.0" text="csp.Sudoku">
+                             <font>
+                                 <Font size="16.0" />
+                             </font>
+                         </Label>
+                         <Label fx:id="sudokuNumberLabel" layoutX="145.0" layoutY="69.0" prefHeight="38.0" prefWidth="36.0" />
+                         <Button fx:id="startSudokuButton" layoutX="71.0" layoutY="165.0" mnemonicParsing="false" onAction="#startSudoku" prefHeight="39.0" prefWidth="62.0" text="Start" />
+                         <Text fx:id="sudokuVisitedText" layoutX="105.0" layoutY="438.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="70.0" />
+                         <Label fx:id="sudokuVisitedTextLabel" layoutX="47.0" layoutY="425.0" text="VISITED:" visible="false" />
+                         <Text fx:id="sudokualgorithmNameText" boundsType="LOGICAL_VERTICAL_CENTER" fill="#0067ff" layoutX="26.0" layoutY="410.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="156.0" />
+                         <Label fx:id="sudokuVisitedTimeLabel" layoutX="49.0" layoutY="450.0" text="TIME:" visible="false" />
+                         <Text fx:id="sudokuVisitedTime" layoutX="105.0" layoutY="463.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="70.0" />
+                         <CheckBox layoutX="47.0" layoutY="242.0" mnemonicParsing="false" text="CheckBox" />
+                     </children>
+                      <effect>
+                          <DropShadow blurType="GAUSSIAN" color="#0000008b" />
+                      </effect>
+                  </AnchorPane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+    <AnchorPane id="showSolvedQueens" minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="385.0" SplitPane.resizableWithParent="false">
+         <children>
+            <GridPane fx:id="showResultGridPane" alignment="CENTER" layoutX="-14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
+
+            </GridPane>
+         </children></AnchorPane>
+  </items>
+</SplitPane>
