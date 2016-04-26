@@ -8,13 +8,13 @@ import java.text.NumberFormat;
 public class CSP {
 
     public static void main(String[] args) throws Exception {
-        int size = 18;
+        int size =20;
         int sudokuSize = 3;
         int remove = 0;
-        /*Queens queens = new Queens(size);
+        Queens queens = new Queens(size);
 
 //        Long time = System.currentTimeMillis();
-        System.out.println("FORWARD\n");
+        /*System.out.println("FORWARD\n");
         queens.solveQueensForward();
 //        time = System.currentTimeMillis() - time;
         System.out.println("FORWARD visited : " + NumberFormat.getInstance().format(queens.getVisitedFC()) + "\n");
@@ -28,6 +28,7 @@ public class CSP {
         System.out.println("BACKTRACKING visited : " + NumberFormat.getInstance().format(queens.getVisitedBT()) + "\n");
         System.out.println("BACKTRACKING time : " +  NumberFormat.getInstance().format(queens.time));
 */
+
         Sudoku sudoku = new Sudoku(sudokuSize, remove);
 
         Cell[][] sudokuBoard = sudoku.readSudoku();

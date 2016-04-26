@@ -1,6 +1,5 @@
 package csp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -16,6 +15,7 @@ public class Queens {
     private int visitedBT = 0;
     private int visitedFC = 0;
     private boolean heuristicLCV = false;
+    private boolean heuristicMRV = true;
     private int[] preparedDomain;
     public Long time;
     private int columnsSet =0;
@@ -47,10 +47,10 @@ public class Queens {
     public Cell[] solveQueensBacktracking() {
         Cell[] queens = this.prepareCells();
         time = System.nanoTime();
-        if (!this.backtracking(queens, 0)) {
+        if (!this.backtracking(queens, 0, 0, 0)) {
             time = System.nanoTime()-time;
             System.out.println("No solution!");
-            this.printQueens(queensSolved);
+            this.printQueens(queens);
         } else {
             time = System.nanoTime()-time;
             this.printQueens(queens);
@@ -61,11 +61,9 @@ public class Queens {
 
     public Cell[] solveQueensForward() {
         Cell[] queens = this.prepareCells();
-        HashMap<Integer, HashMap<Integer, Cell>> domains = new HashMap<>();
-        HashMap<Integer, Cell> level0 = this.copyLevel(queens);
-        domains.put(0, level0);
+
         time = System.nanoTime();
-        if (!this.forwardChecking(queens, 0, 0, 0, domains)) {
+        if (!this.forwardChecking(queens, 0, 0, 0, this.prepareHashSet(queens))) {
             time = System.nanoTime()-time;
             System.out.println("No solution!");
             this.printQueens(queens);
@@ -76,6 +74,13 @@ public class Queens {
             return queensSolved;
         }
 
+    }
+
+    private HashMap<Integer, HashMap<Integer, Cell>> prepareHashSet(Cell[] queens){
+        HashMap<Integer, HashMap<Integer, Cell>> domains = new HashMap<>();
+        HashMap<Integer, Cell> level0 = this.copyLevel(queens);
+        domains.put(0, level0);
+        return domains;
     }
 
     private Cell[] prepareCells() {
@@ -101,23 +106,42 @@ public class Queens {
     }
 
 
-    public boolean backtracking(Cell[] queens, int column) {
+    public boolean backtracking(Cell[] queens,
+                                int column,
+                                int next,
+                                int lastValue) {
         if (columnsSet== size) {
             return true;
         }
 
-        for (int i = 0; i < queens.length; i++) {
+//        for (int i = 0; i < queens.length; i++) {
+        while (next<size) {
             visitedBT++;
-            if (checkConstraints(queens, i + 1, column)) {
-                queens[column].value = i + 1;
+            int value = this.giveNextValue(queens[column], lastValue, next, 1);
+//            System.out.println("VAL: "+value);
+//            System.out.println("COL: "+column);
+            if (checkConstraints(queens, value, column)) {
+                queens[column].value = value;
                 this.columnsSet++;
-                int col = this.giveNextVal(column);
+//                domains.put(level, this.copyLevel(queens));
+                for (int j = 0; j < queens.length; ++j) {
+                    if (j == column || queens[j].value != 0)
+                        continue;
+                    this.verifyDomain(queens, j);
+                    if (this.checkEmptyDomains(queens, j)) {
+                        break;
+                    }
+                }
+                int col = this.giveNextVariable(queens, column);
 //                this.printQueens(queens);
 //                System.out.println("NEXT: "+col);
-                if (backtracking(queens, col)) return true;
+                if (backtracking(queens, col, 0, queens[column].value)) return true;
                 queens[column].value = 0;
+//                this.readHashMap(domains.get(level), queens);
                 this.columnsSet--;
             }
+            next++;
+//        }
         }
         return false;
     }
@@ -131,8 +155,9 @@ public class Queens {
 //        Cell backup = this.copyQueen(queens[column]);
         while (next < (size - queens[column].numberOfZeroElementsInDomain)) {
             visitedFC++;
-            int valFromDomain;
-            valFromDomain = giveValFromDomain(queens[column], next);
+            int lastVal = column>0?queens[column-1].value:-1;
+
+            int valFromDomain = giveNextValue(queens[column], lastVal,  next, 0);
             queens[column].value = valFromDomain;
             this.columnsSet++;
 //            System.out.println("NEXT: "+col);
@@ -151,7 +176,7 @@ public class Queens {
                 }
 //            this.printQueens(queens);
             }
-            int col = this.giveNextVal(column);
+            int col = this.giveNextVariable(queens, column);
             //if (!this.checkEmptyDomains(queens, j)) {
             if (domainsNotEmpty && forwardChecking(queens, (col), 0, level + 1, domains)) {
                 return true;
@@ -197,17 +222,6 @@ public class Queens {
             queensStr += '\n';
         }
         System.out.println(queensStr);
-    }
-
-    private int giveValFromDomain(Cell cell, int next) {
-        int result = 0;
-        for (int i = 0; i < cell.domain.length; i++) {
-            if (cell.domain[i] != 0) {
-                if (result == next) return cell.domain[i];
-                else result++;
-            }
-        }
-        return 0;
     }
 
     private void verifyDomains(Cell[] queens) {
@@ -300,12 +314,34 @@ public class Queens {
         return 0;
     }
 
-    private int giveNextVal(int lastCol){
+    private int giveNextValue(Cell cell, int lastRow, int next, int backtracking){
         int result = 0;
         if(heuristicLCV){
-            result = this.LCV(lastCol);
+            result = this.LCV(lastRow);
         }
-        else if(lastCol!=-1) result = lastCol+1;
+        else if(backtracking==1) result = this.giveValFromDomain(this.preparedDomain, next);
+        else result = this.giveValFromDomain(cell.domain, next );
+        return result;
+    }
+
+    private int giveValFromDomain(int[] domain, int next) {
+        int result = 0;
+        for (int i = 0; i < domain.length; i++) {
+            if (domain[i] != 0) {
+                if (result == next) {
+                     return domain[i];
+                }
+                else result++;
+            }
+        }
+        return 0;
+    }
+
+    private int giveNextVariable(Cell[] queens, int lastCol){
+        int result = 0;
+        if(heuristicMRV){
+            result = this.MRV(queens);
+        } else result = lastCol+1;
         return result;
     }
 
@@ -314,7 +350,7 @@ public class Queens {
         int minZeroElems = 0;
         int column = 0;
         for (int i =0 ; i<size; i++) {
-            if(queens[i].numberOfZeroElementsInDomain>minZeroElems && queens[i].value!=0){
+            if(queens[i].numberOfZeroElementsInDomain>minZeroElems && queens[i].value==0){
                 minZeroElems = queens[i].numberOfZeroElementsInDomain;
                 column = i;
             }
@@ -323,16 +359,20 @@ public class Queens {
     }
 
     private int LCV(int lastRow){
-        int col = 0;
+        int row = 0;
 //        if(lastCol == 0 && columnsSet==1) col = 0;
-        if(columnsSet<size){
-            if(lastRow==0)col = size-1;
-            else if(lastRow==size-1) col = 1;
-            else if(lastRow==1) col = size-2;
-            else if (columnsSet%2==0) col = size-lastRow;
-            else if(columnsSet%2==1) col = size-lastRow-1;
+        /*if(columnsSet<size){
+            if(lastRow==-1) row = 1;
+            else if(lastRow==0)row = size;
+            else if(lastRow==size-1) row = 2;
+            else if(lastRow==1) row = (size-2)+1;
+            else if (columnsSet%2==0) row = (size-lastRow)+1;
+            else if(columnsSet%2==1) row = size-lastRow+1;
 //            else col = size-lastCol;
-        }
-        return col;
+        }*/
+
+
+
+        return row;
     }
 }

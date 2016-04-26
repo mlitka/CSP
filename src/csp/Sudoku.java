@@ -22,6 +22,7 @@ public class Sudoku {
     private Cell[][] sudokuSolved;
     private int[] preparedDomain;
     private int cellsSet;
+    private boolean heuristicMRV =  true;
 
     public Sudoku(int boxSize) {
         this.boxSize = boxSize;
@@ -108,7 +109,7 @@ public class Sudoku {
             System.out.println("No solution!");
         } else {
             time = System.nanoTime()-time;
-//            this.printSudoku(sudoku);
+            this.printSudoku(sudoku);
 
         }
 
@@ -165,10 +166,13 @@ public class Sudoku {
                 visitedBT++;
                 if (checkRow(sudoku, row, num) && checkCol(sudoku, column, num) && checkBox(sudoku, row, column, num)) {
                     sudoku[row][column].value = num;
+                    this.cellsSet++;
+                    this.verifyAllDomains(sudoku, row, column);
 //                    this.printSudoku(sudoku);
                     int[] rowCol = next(row, column);
                     if (backtracking(sudoku, rowCol[0], rowCol[1])) return true;
                     sudoku[row][column].value = 0;
+                    this.cellsSet--;
                 }
             }
         }
@@ -205,21 +209,7 @@ public class Sudoku {
 
             domains.put(level, this.copyLevel(sudoku));
 //            System.out.println("LEVEL "+level);
-            boolean domainsNotEmpty = true;
-            for (int i = 0; i<size; i++){
-                for (int j = 0; j<size; j++){
-                    if ((i==row && j==column)|| sudoku[i][j].value!=0) {
-                        continue;
-                    }
-                    this.verifyDomain(sudoku, i, j);
-//                    System.out.println("[" + i + ", " + j + "]\t" + sudoku[i][j]);
-                    if(this.checkEmptyDomain(sudoku, i, j)){
-                        domainsNotEmpty = false;
-                        break;
-                    }
-                }
-                if(!domainsNotEmpty) break;
-            }
+            boolean domainsNotEmpty = this.verifyAllDomains(sudoku, row, column);
 //            this.printSudoku(sudoku);
             int[] rowCol = next(row, column);
             if (domainsNotEmpty && forwardChecking(sudoku, rowCol[0], rowCol[1], 0, level+1, domains)) {
@@ -233,6 +223,25 @@ public class Sudoku {
             next++;
         }
         return false;
+    }
+
+    private boolean verifyAllDomains(Cell[][] sudoku, int row, int column){
+        boolean domainsNotEmpty = true;
+        for (int i = 0; i<size; i++){
+            for (int j = 0; j<size; j++){
+                if ((i==row && j==column)|| sudoku[i][j].value!=0) {
+                    continue;
+                }
+                this.verifyDomain(sudoku, i, j);
+//                    System.out.println("[" + i + ", " + j + "]\t" + sudoku[i][j]);
+                if(this.checkEmptyDomain(sudoku, i, j)){
+                    domainsNotEmpty = false;
+                    break;
+                }
+            }
+            if(!domainsNotEmpty) break;
+        }
+        return domainsNotEmpty;
     }
 
 
@@ -351,6 +360,30 @@ public class Sudoku {
         if (cellsSet<size*size && column < size && row < size && sudoku[row][column].value == 0)
             result = sudoku[row][column].numberOfZeroElementsInDomain == size;
         return result;
+    }
+
+
+    private int giveNextVariable(Cell[][] sudoku, int lastCol){
+        int result = 0;
+        if(heuristicMRV){
+            result = this.MRV(sudoku);
+        } else result = lastCol+1;
+        return result;
+    }
+
+    //    Minimum Remaining Values – wybór zmiennej o najmniejszej dziedzinie
+    private int MRV(Cell[][] sudoku) {
+        int minZeroElems = 0;
+        int column = 0;
+        for (int i =0 ; i<size; i++) {
+            for (int j = 0; j<size; j++){
+                if(sudoku[i][j].numberOfZeroElementsInDomain>minZeroElems && sudoku[i][j].value==0){
+                    minZeroElems = sudoku[i][j].numberOfZeroElementsInDomain;
+                    column = i;
+                }
+            }
+        }
+        return column;
     }
 
 
